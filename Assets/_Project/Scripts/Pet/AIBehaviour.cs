@@ -3,38 +3,49 @@ using RTDK.Logger;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class AIBehaviour : MonoBehaviour
+public class AIBehaviour : MonoBehaviour, IClickable
 {
     [SerializeField]
     FaceMoodHandler faceMoodHandler;
 
     NavMeshAgent agent;
 
-    [SerializeField]
-    float moveSpeed = 3;
-
     public PetMood GetCurrentMood() => currentMood;
     private PetMood currentMood = PetMood.Idle;
 
     public float GetCurrentHappyness() => happyness;
-    [SerializeField, ProgressBar]
+    [SerializeField, ProgressBar, ColorField(GUIColor.Lime)]
     float happyness = 80f;
 
+    public float GetCurrentEnergy() => energy;
+    [SerializeField, ProgressBar, ColorField(GUIColor.Blue)]
+    float energy = 100f;
+
+    [SerializeField, ProgressBar(), ColorField(GUIColor.Brown)]
+    float hunger = 100f;
+
     public float GetCurrentCreativity() => creativity;
-    [SerializeField, ProgressBar]
+    [SerializeField, ProgressBar, ColorField(GUIColor.Pink)]
     float creativity = 0f;
 
     public float GetCurrentSnuggle() => snuggle;
-    [SerializeField, ProgressBar]
+    [SerializeField, ProgressBar, ColorField(GUIColor.Red)]
     float snuggle = 0;
 
+
     [SerializeField]
-    MinMaxFloat decisionTimes, movementDistance;
+    MinMaxFloat decisionTimes, movementDistance, eatTimes;
     float nextDecisionTimer;
+    float eatTimer;
+
+    [SerializeField]
+    private ParticleSystem loveParticle;
 
     Vector3 targetPosition;
 
     PetState currentState = PetState.Idle;
+
+    Vector2 lastMousePos;
 
     private void Awake()
     {
@@ -44,64 +55,101 @@ public class AIBehaviour : MonoBehaviour
     private void Start()
     {
         nextDecisionTimer = decisionTimes.GetRandom();
-    }
-
-    private void OnMouseDown()
-    {
-        Pat();
-    }
-
-    private void OnMouseUp()
-    {
-        ChangeMood(PetMood.Idle);
+        lastMousePos = Input.mousePosition;
     }
 
     private void Update()
     {
-        switch (currentMood)
+        ConsumeEnergy();
+
+        switch (currentState)
         {
-            case PetMood.Idle:
+            case PetState.Idle:
                 Idle();
                 break;
-            case PetMood.Cozy:
-                Cozy();
+            case PetState.Walking:
+                CheckDestination();
                 break;
-            case PetMood.Sad:
-                Sad();
+            case PetState.Eating:
+                Eat();
                 break;
-            case PetMood.Creative:
-                Creative();
+            case PetState.Gaming:
+                PlayGames();
                 break;
+            case PetState.Drawing:
+                Draw();
+                break;
+            case PetState.Sleeping:
+                Sleep();
+                break;
+        }
+    }
+
+    void Sleep()
+    {
+        //TODO: Anims ecc
+
+        if (energy < 100)
+            energy += 5f;
+    }
+
+    void Draw()
+    {
+
+    }
+
+    void PlayGames()
+    {
+
+    }
+
+    void Eat()
+    {
+        if (eatTimer > 0)
+        {
+            eatTimer -= Time.deltaTime;
+            ChangeState(PetState.Idle);
         }
     }
 
     void Pat()
     {
-        RTDKLogger.Log("Pattata");
-        happyness += 0.05f;
-        snuggle += .5f;
+        if (currentState != PetState.Idle && currentState != PetState.Walking) return;
+
+        if (!loveParticle.isPlaying)
+        {
+            RTDKLogger.Log("Pattata");
+            happyness += 0.05f;
+            snuggle += .5f;
+            loveParticle.Play();
+        }
+
         ChangeMood(PetMood.Blushy);
+    }
+
+    void ConsumeEnergy()
+    {
+        if (currentState != PetState.Sleeping)
+            energy -= 0.001f;
     }
 
     void Idle()
     {
-        if (currentState == PetState.Idle)
+        if (nextDecisionTimer > 0)
+            nextDecisionTimer -= Time.deltaTime;
+        else
         {
-            if (nextDecisionTimer > 0)
-                nextDecisionTimer -= Time.deltaTime;
-            else
-            {
-                var target = transform.position;
-                target.x += movementDistance.GetRandom();
-                target.z += movementDistance.GetRandom();
-                targetPosition = target;
-                agent.SetDestination(targetPosition);
-
-                currentState = PetState.Walking;
-            }
+            SetNewDestination();
+            currentState = PetState.Walking;
         }
-        else if (currentState == PetState.Walking)
-            CheckDestination();
+    }
+
+    void SetNewDestination()
+    {
+        var random = Random.insideUnitCircle * movementDistance.GetRandom();
+        var target = transform.position + new Vector3(random.x, 0, random.y);
+        targetPosition = target;
+        agent.SetDestination(targetPosition);
     }
 
     void CheckDestination()
@@ -113,44 +161,39 @@ public class AIBehaviour : MonoBehaviour
         }
     }
 
-    void Cozy()
+    public void ChangeState(PetState state)
     {
-
-    }
-
-    void Sad()
-    {
-
-    }
-
-    void Creative()
-    {
-
-    }
-
-
-    void StartDragging()
-    {
-        ChangeMood(PetMood.Blushy);
-    }
-
-    void EndDragging()
-    {
-        ChangeMood(PetMood.Idle);
-    }
-
-    void Dragging()
-    {
-        ChangeMood(PetMood.Grabbed);
+        currentState = state;
     }
 
     public void ChangeMood(PetMood mood)
     {
+        currentMood = mood;
         faceMoodHandler.OnMoodChange(mood);
+    }
+
+    public void OnClickDown()
+    {
+
+    }
+
+    public void OnClickUp()
+    {
+        ChangeMood(PetMood.Idle);
+    }
+
+    public void OnClick()
+    {
+        if (Vector3.Distance(lastMousePos, Input.mousePosition) > 0.5f)
+        {
+            Pat();
+        }
+
+        lastMousePos = Input.mousePosition;
     }
 }
 
 public enum PetState
 {
-    Idle, Walking
+    Idle, Walking, Drawing, Gaming, Eating, Sleeping
 }
