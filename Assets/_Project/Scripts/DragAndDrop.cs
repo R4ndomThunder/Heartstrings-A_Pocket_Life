@@ -8,7 +8,7 @@ public class DragAndDrop : MonoBehaviour
     Vector3 mousePosition;
     Rigidbody rb;
 
-    public Action onStartDrag, onEndDrag;
+    public Action onStartDrag, onDragging, onEndDrag;
 
     Vector3 GetMousePos() => Utils.Camera.WorldToScreenPoint(transform.position);
 
@@ -27,7 +27,11 @@ public class DragAndDrop : MonoBehaviour
     private void OnMouseDrag()
     {
         var target = Utils.Camera.ScreenToWorldPoint(Input.mousePosition - mousePosition);
-        rb.MovePosition(target);
+        if (transform.position != target)
+        {
+            rb.MovePosition(target);
+            onDragging.Invoke();
+        }
     }
 
     private void OnMouseUp()

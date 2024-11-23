@@ -21,7 +21,8 @@ public class FaceMoodHandler : MonoBehaviour
 
 public enum PetMood
 {
-    Cozy, Creative, Idle, Sad, Grabbed
+    Cozy, Creative, Idle, Sad, Grabbed,
+    Blushy
 }
 
 [Serializable]
