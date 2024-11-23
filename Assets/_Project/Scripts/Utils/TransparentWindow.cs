@@ -23,6 +23,9 @@ public class TransparentWindow : MonoBehaviour
     private static extern uint DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS margins);
 
     [DllImport("user32.dll")]
+    static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+    [DllImport("user32.dll")]
     private static extern int SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
 
     const int GWL_EXSTYLE = -20;
@@ -47,7 +50,7 @@ public class TransparentWindow : MonoBehaviour
 
         SetWindowLong(hWnd, GWL_EXSTYLE, WS_EX_LAYERED);
 
-        SetLayeredWindowAttributes(hWnd, 0,0,LWA_COLORKEY);
+        SetLayeredWindowAttributes(hWnd, 0,255,LWA_COLORKEY);
 
         SetWindowPos(hWnd, HWND_TOPMOST, 0,0,0,0,0);
 #endif
@@ -56,7 +59,7 @@ public class TransparentWindow : MonoBehaviour
 
     private void Update()
     {
-        SetClickthrough(Physics2D.OverlapPoint(Utils.Camera.ScreenToWorldPoint(Input.mousePosition)) == null);
+        //SetClickthrough(Physics2D.OverlapPoint(Utils.GetMouseWorldPosition()) == null);
     }
 
     void SetClickthrough(bool clickThrough)
