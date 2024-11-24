@@ -41,6 +41,6 @@ public class Accordion : MonoBehaviour
     {
         btn.sprite = isCompact ? caretUp : caretDown;
         var y = isCompact ? ySize.Min : ySize.Max;
-        rect.sizeDelta = new(200, y);
+        rect.sizeDelta = new(rect.sizeDelta.x, y);
     }
 }
