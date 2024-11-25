@@ -11,11 +11,22 @@ public class PaginatedText : MonoBehaviour
 
     int currentPage = 1;
 
+    int totalPages = 0;
+
     private void OnEnable()
     {
         currentPage = 1;
         pageContent.pageToDisplay = 1;
         pageCounter.text = $"{currentPage}/{pageContent.textInfo.pageCount}";
+    }
+
+    void Update()
+    {
+        if (totalPages == 0)
+        {
+            totalPages = pageContent.textInfo.pageCount;
+            pageCounter.text = $"{currentPage}/{totalPages}";
+        }
     }
 
     public void NextPage()
