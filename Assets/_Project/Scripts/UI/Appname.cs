@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class Appname : MonoBehaviour
 {
-    [SerializeField]
     private TextMeshProUGUI titleName;
     private void Awake()
     {
@@ -12,6 +11,6 @@ public class Appname : MonoBehaviour
 
     void Start()
     {
-        titleName.text = $"{Application.productName}.exe";
+        titleName.text = $"{Application.productName}";
     }
 }

@@ -22,6 +22,7 @@ public class BedActivity : ActivityBase
     private float creativeHappyDecrement = 0.01f;
     private float creativeEnergyIncrement = 0.01f;
 
+
     public override void OnUpdate()
     {
         base.OnUpdate();

@@ -9,6 +9,9 @@ public class SofaActivity : ActivityBase
     [SerializeField]
     List<GameObject> cozyObjects, idleObject = new();
 
+    [SerializeField]
+    ParticleSystem filmParticle, gameParticle;
+
     public override void OnUpdate()
     {
         base.OnUpdate();
@@ -30,12 +33,28 @@ public class SofaActivity : ActivityBase
             {
                 obj.SetActive(!playerIsVisible);
             }
+
+            if (filmParticle != null)
+            {
+                if (playerIsVisible)
+                    filmParticle.Stop();
+                else
+                    filmParticle.Play();
+            }
         }
         else if (ai.GetCurrentMood() == PetMood.Normal)
         {
             foreach (GameObject obj in idleObject)
             {
                 obj.SetActive(!playerIsVisible);
+            }
+
+            if (gameParticle != null)
+            {
+                if (playerIsVisible)
+                    gameParticle.Stop();
+                else
+                    gameParticle.Play();
             }
         }
 

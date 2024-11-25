@@ -173,7 +173,8 @@ public class AIBehaviour : MonoBehaviour, IClickable
                 Eat();
                 break;
             case PetState.Gaming:
-                PlayGames();
+            case PetState.WatchTV:
+                UseSofa();
                 break;
             case PetState.Working:
                 Work();
@@ -300,7 +301,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
         UseActivity(art);
     }
 
-    void PlayGames()
+    void UseSofa()
     {
         UseActivity(sofa);
     }
@@ -373,6 +374,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
             if (!loveParticle.isPlaying)
             {
                 love.Add(10f);
+                happyness.Add(2f);
                 loveParticle.Play();
             }
         }

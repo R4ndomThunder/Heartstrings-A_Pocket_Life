@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public abstract class ActivityBase : MonoBehaviour
 {
@@ -13,6 +14,11 @@ public abstract class ActivityBase : MonoBehaviour
     internal Transform targetPos;
 
     internal bool isDoingSomething = false;
+    [SerializeField]
+    internal bool isACreativeActivity = false;
+
+    [SerializeField]
+    ParticleSystem activityParticle;
 
     private void Awake()
     {
@@ -23,12 +29,19 @@ public abstract class ActivityBase : MonoBehaviour
     {
         ToggleObjects(true);
         ai.ChangeState(PetState.Idle);
-        ai.activityCounter++;
+
+        if (activityParticle != null)
+            activityParticle.Stop();
+
+        if (isACreativeActivity)
+            ai.activityCounter++;
     }
 
     public virtual void JoinActivity()
     {
         ToggleObjects(false);
+        if (activityParticle != null)
+            activityParticle.Play();
     }
 
     public virtual void OnUpdate()
