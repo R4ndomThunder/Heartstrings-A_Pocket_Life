@@ -8,9 +8,17 @@ public class Alert : MonoBehaviour
     [SerializeField]
     GameObject alertIcon;
 
+    [SerializeField]
+    AudioSource alertSound;
+
     // Update is called once per frame
     void Update()
     {
-        alertIcon.SetActive(ai.snuggle.GetValue() < 20 || ai.hunger.GetValue() < 20 || ai.creativity.GetValue() < 20 || ai.energy.GetValue() < 20);
+        var isAlert = ai.happyness.GetValue() < ai.statsThreshold || ai.love.GetValue() < ai.statsThreshold || ai.hunger.GetValue() < ai.statsThreshold || ai.creativity.GetValue() < ai.statsThreshold || ai.energy.GetValue() < ai.statsThreshold;
+
+        alertIcon.SetActive(isAlert);
+
+        if (!alertSound.isPlaying && (ai.happyness.GetValue() < ai.statsThreshold && ai.GetCurrentState() != PetState.GameOver))
+            alertSound.Play();
     }
 }

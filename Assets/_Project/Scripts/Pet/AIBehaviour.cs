@@ -1,8 +1,7 @@
-using RTDK.InspectorPlus;
 using RTDK.Logger;
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Runtime.ExceptionServices;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,9 +9,16 @@ public class AIBehaviour : MonoBehaviour, IClickable
 {
     [SerializeField]
     FaceMoodHandler faceMoodHandler;
+    [SerializeField]
+    MoodSfx moodSfx;
 
     [SerializeField]
-    GameObject body;
+    internal GameObject copertina;
+
+    [SerializeField]
+    internal GameObject body;
+    [SerializeField]
+    internal GameObject cryingBody;
 
     NavMeshAgent agent;
 
@@ -22,29 +28,39 @@ public class AIBehaviour : MonoBehaviour, IClickable
     private PetMood currentMood = PetMood.Idle;
 
     [SerializeField]
-    float statsAmountDecrement = 0.005f, statsAmountIncrement = 0.01f;
+    float statsAmountDecrement = 0.005f;
 
     [SerializeField]
-    internal Stat happyness, snuggle, hunger, creativity, energy;
+    internal Stat happyness, love, hunger, creativity, energy;
 
     [SerializeField]
-    Transform bedZone, pcZone, sofaZone, musicZone, eatZone;
+    ActivityBase pc, music, bed, sofa, cookies, art;
 
     [SerializeField]
-    List<GameObject> bedItems, pcItems, sofaItems, musicItems, eatItems;
+    internal float statsThreshold = 30;
 
     [SerializeField]
-    MinMaxFloat decisionTimes, movementDistance, activityTimes;
+    internal AnimationCurve loveDecreasingCurve, happynessDecreasingCurve, creativityDecreasingCurve;
+
+    [SerializeField]
+    MinMaxFloat decisionTimes, movementDistance;
     float nextDecisionTimer;
+
+    [SerializeField]
+    float gameOverPatTime = 30;
+    float pattingTimer = 30;
 
     [SerializeField]
     private ParticleSystem loveParticle;
 
     Vector3 targetPosition;
 
+    public PetState GetCurrentState() => currentState;
     PetState currentState = PetState.Idle;
 
     Vector2 lastMousePos;
+
+    bool isDoingActivity => currentState != PetState.Idle && currentState != PetState.Walking && currentState != PetState.Sleeping;
 
     private void Awake()
     {
@@ -60,9 +76,95 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
     private void Update()
     {
-        ConsumeHappyness();
-        ConsumeValues();
+        ConsumeStats();
 
+        CheckMood();
+
+        HandleState();
+
+        anim.SetFloat("Speed", agent.velocity.sqrMagnitude > 0 ? 1 : 0);
+    }
+
+    void ConsumeStats()
+    {
+        if (currentState != PetState.GameOver)
+        {
+            energy.Remove(statsAmountDecrement * (isDoingActivity ? 1.5f : 1));
+
+            hunger.Remove(statsAmountDecrement);
+
+            creativity.Remove(statsAmountDecrement * creativityDecreasingCurve.Evaluate(creativity.GetValue() / 100f));
+
+            happyness.Remove(statsAmountDecrement * happynessDecreasingCurve.Evaluate(happyness.GetValue() / 100f));
+
+            love.Remove(statsAmountDecrement * (loveDecreasingCurve.Evaluate(happyness.GetValue() / 100f)));
+
+
+            if (happyness.GetValue() <= 0)
+            {
+                Cry();
+            }
+        }
+    }
+
+
+    int activityCounter = 0;
+    void CheckMood()
+    {
+        switch (currentMood)
+        {
+            case PetMood.Idle:
+                {
+                    if (happyness.GetValue() < statsThreshold && love.GetValue() < statsThreshold)
+                    {
+                        ChangeMood(PetMood.Sad);
+                    }
+                    else if (energy.GetValue() < statsThreshold)
+                    {
+                        ChangeMood(PetMood.Cozy);
+                    }
+                    else if (activityCounter > 3 && energy.GetValue() > statsThreshold)
+                    {
+                        activityCounter = 0;
+                        ChangeMood(PetMood.Creative);
+                    }
+                }
+                break;
+            case PetMood.Cozy:
+                {
+                    if (energy.GetValue() >= 98)
+                    {
+                        ChangeMood(PetMood.Idle);
+                    }
+                }
+                break;
+            case PetMood.Creative:
+                {
+                    if (energy.GetValue() < statsThreshold)
+                        ChangeMood(PetMood.Cozy);
+                    else
+                    {
+                        if (activityCounter > 3)
+                        {
+                            activityCounter = 0;
+                            ChangeMood(PetMood.Idle);
+                        }
+                    }
+                }
+                break;
+            case PetMood.Sad:
+                {
+                    if (happyness.GetValue() > statsThreshold)
+                    {
+                        ChangeMood(PetMood.Idle);
+                    }
+                }
+                break;
+        }
+    }
+
+    void HandleState()
+    {
         switch (currentState)
         {
             case PetState.Idle:
@@ -77,252 +179,235 @@ public class AIBehaviour : MonoBehaviour, IClickable
             case PetState.Gaming:
                 PlayGames();
                 break;
+            case PetState.Working:
+                Work();
+                break;
             case PetState.Drawing:
                 Draw();
                 break;
-            case PetState.Music:
+            case PetState.ListenMusic:
                 Music();
                 break;
             case PetState.Sleeping:
                 Sleep();
                 break;
+            case PetState.GameOver:
+                GameOver();
+                break;
         }
     }
 
-    public void DoEating()
+    public void OnHungerClick()
     {
         if (currentState == PetState.Idle || currentState == PetState.Walking)
         {
-            anim.SetFloat("Speed", 1);
-            targetPosition = eatZone.position;
+            targetPosition = cookies.targetPos.position;
             agent.SetDestination(targetPosition);
             ChangeState(PetState.Eating);
         }
     }
 
-    public void GoToEntertain()
+    public void OnActivityClick()
     {
         if (currentState == PetState.Idle || currentState == PetState.Walking)
         {
-            anim.SetFloat("Speed", 1);
-            var random = UnityEngine.Random.Range(0, 3);
-
-            switch (random)
+            switch (currentMood)
             {
-                case 0:
-                    GoToPc();
+                case PetMood.Idle:
+                    {
+                        var random = UnityEngine.Random.Range(0, 3);
+
+                        switch (random)
+                        {
+                            case 0:
+                                GoToPc();
+                                break;
+                            case 1:
+                                GoToGamingSofa();
+                                break;
+                            case 2:
+                                GoToMusic();
+                                break;
+                        }
+                    }
                     break;
-                case 1:
-                    GoToSofa();
+                case PetMood.Creative:
+                    GoToArt();
                     break;
-                case 2:
-                    GoToMusic();
+                case PetMood.Cozy:
+                    GoToTVSofa();
+                    break;
+                case PetMood.Sad:
+                    //TODO: Dormire triste
                     break;
             }
+
+            activityCounter++;
+        }
+    }
+
+    public void OnEnergyClick()
+    {
+        if (currentState == PetState.Idle || currentState == PetState.Walking)
+        {
+            targetPosition = bed.targetPos.position;
+            agent.SetDestination(targetPosition);
+            ChangeState(PetState.Sleeping);
         }
     }
 
     void GoToPc()
     {
-        targetPosition = pcZone.position;
+        targetPosition = pc.targetPos.position;
         agent.SetDestination(targetPosition);
-        ChangeState(PetState.Drawing);
+        ChangeState(PetState.Working);
     }
 
-    void GoToSofa()
+    void GoToTVSofa()
     {
-        targetPosition = sofaZone.position;
+        targetPosition = sofa.targetPos.position;
+        agent.SetDestination(targetPosition);
+        ChangeState(PetState.WatchTV);
+    }
+
+    void GoToGamingSofa()
+    {
+        targetPosition = sofa.targetPos.position;
         agent.SetDestination(targetPosition);
         ChangeState(PetState.Gaming);
     }
 
     void GoToMusic()
     {
-        targetPosition = musicZone.position;
+        targetPosition = music.targetPos.position;
         agent.SetDestination(targetPosition);
-        ChangeState(PetState.Music);
+        ChangeState(PetState.ListenMusic);
     }
 
-    public void GoToSleep()
+    void GoToArt()
     {
-        if (currentState == PetState.Idle || currentState == PetState.Walking)
-        {
-            anim.SetFloat("Speed", 1);
-            targetPosition = bedZone.position;
-            agent.SetDestination(targetPosition);
-            ChangeState(PetState.Sleeping);
-        }
+        targetPosition = art.targetPos.position;
+        agent.SetDestination(targetPosition);
+        ChangeState(PetState.Drawing);
     }
 
     void Sleep()
     {
-        if (targetPosition == bedZone.position)
-        {
-            if (agent.pathPending) return;
-
-            if (agent.remainingDistance <= .25f)
-            {
-                ChangeVisibility(bedItems, false);
-
-                energy.Add(statsAmountIncrement);
-
-                if (energy.GetValue() == energy.MinMaxValue.Max)
-                {
-                    ChangeVisibility(bedItems, true);
-                    GetUp();
-                }
-            }
-        }
-    }
-
-    void ChangeVisibility(List<GameObject> items, bool isPlayerVisible)
-    {
-        if (!isPlayerVisible)
-            anim.SetFloat("Speed", 0);
-        //agent.enabled = isPlayerVisible;
-        foreach (var item in items)
-        {
-            item.SetActive(!isPlayerVisible);
-        }
-
-        body.SetActive(isPlayerVisible);
-    }
-
-    void GetUp()
-    {
-        targetPosition = Vector3.zero;
-        ChangeState(PetState.Idle);
+        UseActivity(bed);
     }
 
     void Music()
     {
-        if (targetPosition == musicZone.position)
-        {
-            if (agent.pathPending) return;
-
-            if (agent.remainingDistance <= .05f)
-            {
-                ChangeVisibility(musicItems, false);
-
-                creativity.Add(statsAmountIncrement);
-
-                if (creativity.GetValue() == creativity.MinMaxValue.Max)
-                {
-                    ChangeVisibility(musicItems, true);
-                    GetUp();
-                }
-            }
-        }
+        UseActivity(music);
     }
 
     void Draw()
     {
-        if (targetPosition == pcZone.position)
-        {
-            if (agent.pathPending) return;
-
-            if (agent.remainingDistance <= .05f)
-            {
-                ChangeVisibility(pcItems, false);
-
-                creativity.Add(statsAmountIncrement);
-
-                if (creativity.GetValue() == creativity.MinMaxValue.Max)
-                {
-                    ChangeVisibility(pcItems, true);
-                    GetUp();
-                }
-            }
-        }
+        UseActivity(art);
     }
 
     void PlayGames()
     {
-        if (targetPosition == sofaZone.position)
-        {
-            if (agent.pathPending) return;
-
-            if (agent.remainingDistance <= .05f)
-            {
-                ChangeVisibility(sofaItems, false);
-
-                creativity.Add(statsAmountIncrement);
-
-                if (creativity.GetValue() == creativity.MinMaxValue.Max)
-                {
-                    ChangeVisibility(sofaItems, true);
-                    GetUp();
-                }
-            }
-        }
+        UseActivity(sofa);
     }
 
     void Eat()
     {
-        if (targetPosition == eatZone.position)
+        UseActivity(cookies);
+    }
+
+    void Work()
+    {
+        UseActivity(pc);
+    }
+
+    void GameOver() { }
+
+    void UseActivity(ActivityBase act)
+    {
+        var dist = GetDistanceFromActivity(act);
+
+        if (dist.HasValue && dist.Value <= .05f)
         {
-            if (agent.pathPending) return;
-
-            if (agent.remainingDistance <= .05f)
-            {
-                ChangeVisibility(eatItems, false);
-
-                hunger.Add(statsAmountIncrement);
-
-                if (hunger.GetValue() == hunger.MinMaxValue.Max)
-                {
-                    ChangeVisibility(eatItems, true);
-                    GetUp();
-                }
-            }
+            if (!act.isDoingSomething)
+                act.JoinActivity();
+            else
+                act.OnUpdate();
         }
+    }
+
+    float? GetDistanceFromActivity(ActivityBase act)
+    {
+        if (targetPosition == act.targetPos.position)
+        {
+            if (agent.pathPending)
+            {
+                return null;
+            }
+
+            return agent.remainingDistance;
+        }
+
+        return null;
     }
 
     void Pat()
     {
-        if (currentState != PetState.Idle && currentState != PetState.Walking) return;
+        if (currentState != PetState.Idle && currentState != PetState.Walking && currentState != PetState.GameOver) return;
 
-        if (!loveParticle.isPlaying)
+        if (currentState == PetState.GameOver)
         {
-            RTDKLogger.Log("Pattata");
-            happyness.Add(.1f);
-            snuggle.Add(10f);
-            loveParticle.Play();
+            if (!loveParticle.isPlaying)
+            {
+                loveParticle.Play();
+            }
+
+            pattingTimer -= Time.deltaTime;
+            if (pattingTimer <= 0)
+            {
+                ResetPet();
+            }
         }
-
-        ChangeMood(PetMood.Blushy);
-    }
-
-    void ConsumeHappyness()
-    {
-        if (snuggle.GetValue() < 20 || hunger.GetValue() < 20 || creativity.GetValue() < 20 || energy.GetValue() < 20)
-        {
-            happyness.Remove(statsAmountDecrement);
-            snuggle.Remove(statsAmountDecrement);
-        }
-
-        if (snuggle.GetValue() > 80 && hunger.GetValue() > 80 && creativity.GetValue() > 80 && energy.GetValue() > 80)
-        {
-            happyness.Add(statsAmountIncrement);
-        }
-
-        if (happyness.GetValue() < 20)
-            ChangeMood(PetMood.Sad);
         else
-            ChangeMood(PetMood.Idle);
+        {
+            if (currentMood != PetMood.Blushy)
+            {
+                oldMood = currentMood;
+                ChangeMood(PetMood.Blushy);
+            }
+
+            if (!loveParticle.isPlaying)
+            {
+                love.Add(10f);
+                loveParticle.Play();
+            }
+        }
     }
 
-    void ConsumeValues()
+    void Cry()
     {
-        if (currentState != PetState.Sleeping)
-            energy.Remove(statsAmountDecrement);
-
-        if (currentState != PetState.Eating)
-            hunger.Remove(statsAmountDecrement);
-
-        if (currentState != PetState.Drawing && currentState != PetState.Gaming)
-            creativity.Remove(statsAmountDecrement);
+        pattingTimer = gameOverPatTime;
+        ChangeState(PetState.GameOver);
+        targetPosition = transform.position;
+        agent.SetDestination(targetPosition);
+        body.SetActive(false);
+        cryingBody.SetActive(true);
     }
+
+    void ResetPet()
+    {
+        happyness.value = happyness.MinMaxValue.Max;
+        energy.value = energy.MinMaxValue.Max;
+        creativity.value = creativity.MinMaxValue.Max;
+        hunger.value = hunger.MinMaxValue.Max;
+        love.value = love.MinMaxValue.Max;
+
+        cryingBody.SetActive(false);
+        body.SetActive(true);
+        ChangeState(PetState.Idle);
+        ChangeMood(PetMood.Idle);
+    }
+
 
     void Idle()
     {
@@ -337,7 +422,6 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
     void SetNewDestination()
     {
-        anim.SetFloat("Speed", 1);
         var random = UnityEngine.Random.insideUnitCircle * movementDistance.GetRandom();
         var target = new Vector3(random.x, 0, random.y);
         targetPosition = target;
@@ -349,7 +433,6 @@ public class AIBehaviour : MonoBehaviour, IClickable
         if (agent.remainingDistance <= 0.25f)
         {
             nextDecisionTimer = decisionTimes.GetRandom();
-            anim.SetFloat("Speed", 0);
             currentState = PetState.Idle;
         }
     }
@@ -363,6 +446,8 @@ public class AIBehaviour : MonoBehaviour, IClickable
     {
         currentMood = mood;
         faceMoodHandler.OnMoodChange(mood);
+        moodSfx.OnMoodChange(mood);
+        copertina.SetActive(mood == PetMood.Cozy);
     }
 
     public void OnClickDown()
@@ -370,9 +455,14 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
     }
 
+    PetMood oldMood = PetMood.Idle;
     public void OnClickUp()
     {
-        ChangeMood(PetMood.Idle);
+        if (currentState == PetState.GameOver && pattingTimer >= 0)
+            pattingTimer = gameOverPatTime;
+
+        if (currentMood == PetMood.Blushy)
+            ChangeMood(oldMood);
     }
 
     public void OnClick()
@@ -391,11 +481,13 @@ public class Stat
 {
     public float value;
     public MinMaxFloat MinMaxValue;
+
+    public bool IsMax() => value == MinMaxValue.Max;
     public float GetValue() => value;
     public void Add(float val)
     {
         value += val;
-        if (value > MinMaxValue.Max)
+        if (value >= MinMaxValue.Max)
             value = MinMaxValue.Max;
     }
 
@@ -409,5 +501,5 @@ public class Stat
 
 public enum PetState
 {
-    Idle, Walking, Drawing, Gaming, Eating, Sleeping, Music
+    Idle, Walking, Working, Drawing, Gaming, Eating, Sleeping, ListenMusic, WatchTV, GameOver
 }

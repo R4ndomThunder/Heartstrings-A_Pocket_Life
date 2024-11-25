@@ -22,7 +22,7 @@ public class StatsDisplay : MonoBehaviour
         hungerIcon.color = statGradient.Evaluate(hungerVal);
         hungerIcon.fillAmount = hungerVal;
 
-        var loveVal = ai.snuggle.GetValue() / 100f;
+        var loveVal = ai.love.GetValue() / 100f;
         loveIcon.color = statGradient.Evaluate(loveVal);
         loveIcon.fillAmount = loveVal;
 
