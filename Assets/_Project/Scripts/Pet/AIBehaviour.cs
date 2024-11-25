@@ -8,11 +8,6 @@ using UnityEngine.AI;
 public class AIBehaviour : MonoBehaviour, IClickable
 {
     [SerializeField]
-    FaceMoodHandler faceMoodHandler;
-    [SerializeField]
-    MoodSfx moodSfx;
-
-    [SerializeField]
     internal GameObject copertina;
 
     [SerializeField]
@@ -20,12 +15,13 @@ public class AIBehaviour : MonoBehaviour, IClickable
     [SerializeField]
     internal GameObject cryingBody;
 
-    NavMeshAgent agent;
+    internal int activityCounter = 0;
 
+    NavMeshAgent agent;
     Animator anim;
 
     public PetMood GetCurrentMood() => currentMood;
-    private PetMood currentMood = PetMood.Idle;
+    private PetMood currentMood = PetMood.Normal;
 
     [SerializeField]
     float statsAmountDecrement = 0.005f;
@@ -52,6 +48,9 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
     [SerializeField]
     private ParticleSystem loveParticle;
+
+    public static Action<PetMood, PetMood> OnMoodChanged;
+
 
     Vector3 targetPosition;
 
@@ -99,7 +98,6 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
             love.Remove(statsAmountDecrement * (loveDecreasingCurve.Evaluate(happyness.GetValue() / 100f)));
 
-
             if (happyness.GetValue() <= 0)
             {
                 Cry();
@@ -107,13 +105,11 @@ public class AIBehaviour : MonoBehaviour, IClickable
         }
     }
 
-
-    int activityCounter = 0;
     void CheckMood()
     {
         switch (currentMood)
         {
-            case PetMood.Idle:
+            case PetMood.Normal:
                 {
                     if (happyness.GetValue() < statsThreshold && love.GetValue() < statsThreshold)
                     {
@@ -134,7 +130,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
                 {
                     if (energy.GetValue() >= 98)
                     {
-                        ChangeMood(PetMood.Idle);
+                        ChangeMood(PetMood.Normal);
                     }
                 }
                 break;
@@ -147,7 +143,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
                         if (activityCounter > 3)
                         {
                             activityCounter = 0;
-                            ChangeMood(PetMood.Idle);
+                            ChangeMood(PetMood.Normal);
                         }
                     }
                 }
@@ -156,7 +152,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
                 {
                     if (happyness.GetValue() > statsThreshold)
                     {
-                        ChangeMood(PetMood.Idle);
+                        ChangeMood(PetMood.Normal);
                     }
                 }
                 break;
@@ -213,7 +209,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
         {
             switch (currentMood)
             {
-                case PetMood.Idle:
+                case PetMood.Normal:
                     {
                         var random = UnityEngine.Random.Range(0, 3);
 
@@ -241,8 +237,6 @@ public class AIBehaviour : MonoBehaviour, IClickable
                     //TODO: Dormire triste
                     break;
             }
-
-            activityCounter++;
         }
     }
 
@@ -405,7 +399,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
         cryingBody.SetActive(false);
         body.SetActive(true);
         ChangeState(PetState.Idle);
-        ChangeMood(PetMood.Idle);
+        ChangeMood(PetMood.Normal);
     }
 
 
@@ -444,9 +438,8 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
     public void ChangeMood(PetMood mood)
     {
+        OnMoodChanged.Invoke(currentMood, mood);
         currentMood = mood;
-        faceMoodHandler.OnMoodChange(mood);
-        moodSfx.OnMoodChange(mood);
         copertina.SetActive(mood == PetMood.Cozy);
     }
 
@@ -455,7 +448,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
     }
 
-    PetMood oldMood = PetMood.Idle;
+    PetMood oldMood = PetMood.Normal;
     public void OnClickUp()
     {
         if (currentState == PetState.GameOver && pattingTimer >= 0)

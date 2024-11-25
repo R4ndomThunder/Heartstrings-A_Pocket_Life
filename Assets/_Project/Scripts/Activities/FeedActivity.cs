@@ -15,7 +15,7 @@ public class FeedActivity : ActivityBase
 
         ai.hunger.Add(hungerIncrement);
 
-        if (ai.GetCurrentMood() == PetMood.Idle)
+        if (ai.GetCurrentMood() == PetMood.Normal)
         {
             ai.happyness.Add(happynessIncrement);
         }

@@ -31,7 +31,7 @@ public class SofaActivity : ActivityBase
                 obj.SetActive(!playerIsVisible);
             }
         }
-        else if (ai.GetCurrentMood() == PetMood.Idle)
+        else if (ai.GetCurrentMood() == PetMood.Normal)
         {
             foreach (GameObject obj in idleObject)
             {

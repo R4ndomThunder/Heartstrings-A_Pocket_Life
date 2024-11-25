@@ -23,6 +23,7 @@ public abstract class ActivityBase : MonoBehaviour
     {
         ToggleObjects(true);
         ai.ChangeState(PetState.Idle);
+        ai.activityCounter++;
     }
 
     public virtual void JoinActivity()

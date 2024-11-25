@@ -13,10 +13,18 @@ public class MoodSfx : MonoBehaviour
     private void Awake()
     {
         source = GetComponent<AudioSource>();
+        AIBehaviour.OnMoodChanged += OnMoodChange;
     }
 
-    public void OnMoodChange(PetMood mood)
+    private void OnDestroy()
     {
+        AIBehaviour.OnMoodChanged -= OnMoodChange;
+    }
+
+    public void OnMoodChange(PetMood oldMood, PetMood mood)
+    {
+        if (oldMood == PetMood.Blushy) return;
+
         var clip = clips.FirstOrDefault(x => x.mood == mood);
 
         if (clip != null)

@@ -1,10 +1,12 @@
-using RTDK.InspectorPlus;
 using UnityEngine;
 
 public class PaintActivity : ActivityBase
 {
     [SerializeField]
     float creativityIncrement = .5f;
+
+    [SerializeField]
+    GameObject paintWindow;
 
     public override void OnUpdate()
     {
@@ -19,6 +21,6 @@ public class PaintActivity : ActivityBase
     public override void JoinActivity()
     {
         base.JoinActivity();
-        Application.OpenURL("mspaint");
+        paintWindow.SetActive(true);
     }
 }

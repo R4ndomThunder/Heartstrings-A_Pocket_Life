@@ -34,7 +34,7 @@ public class BedActivity : ActivityBase
             case PetMood.Cozy:
                 HandleCozy();
                 break;
-            case PetMood.Idle:
+            case PetMood.Normal:
                 HandleIdle();
                 break;
             case PetMood.Sad:

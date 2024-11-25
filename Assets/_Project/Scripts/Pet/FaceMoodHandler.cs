@@ -12,7 +12,17 @@ public class FaceMoodHandler : MonoBehaviour
     [SerializeField]
     TextMeshProUGUI face;
 
-    public void OnMoodChange(PetMood _mood)
+    private void Awake()
+    {
+        AIBehaviour.OnMoodChanged += OnMoodChange;
+    }
+
+    private void OnDestroy()
+    {
+        AIBehaviour.OnMoodChanged -= OnMoodChange;
+    }
+
+    public void OnMoodChange(PetMood oldMood, PetMood _mood)
     {
         var currentMood = moodFaces.FirstOrDefault(x => x.mood == _mood);
         face.text = currentMood.face;
@@ -21,7 +31,7 @@ public class FaceMoodHandler : MonoBehaviour
 
 public enum PetMood
 {
-    Cozy, Creative, Idle, Sad, Blushy, Cry
+    Cozy, Creative, Normal, Sad, Blushy, Cry
 }
 
 [Serializable]
