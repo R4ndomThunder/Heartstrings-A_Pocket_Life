@@ -1,4 +1,3 @@
-using RTDK.Utility;
 using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -28,6 +27,9 @@ public class TransparentWindow : MonoBehaviour
     [DllImport("user32.dll")]
     private static extern int SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
 
+    [DllImport("user32.dll")]
+    static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+
     const int GWL_EXSTYLE = -20;
 
     const uint WS_EX_LAYERED = 0x00080000;
@@ -39,11 +41,29 @@ public class TransparentWindow : MonoBehaviour
 
     private IntPtr hWnd;
 
+    private void Awake()
+    {
+        //SettingsMenu.onDisplayChange += SetTransparentWindow;
+    }
+
+    private void OnDestroy()
+    {
+        //SettingsMenu.onDisplayChange -= SetTransparentWindow;
+    }
+
     private void Start()
+    {
+        SetTransparentWindow();
+    }
+
+    void SetTransparentWindow()
     {
 #if !UNITY_EDITOR
         hWnd = GetActiveWindow();
 
+        int fWidth = Screen.width;
+        int fHeight = Screen.height;
+        
         MARGINS margins = new MARGINS { cxLeftWidth = -1 };
 
         DwmExtendFrameIntoClientArea(hWnd, ref margins);
@@ -52,7 +72,9 @@ public class TransparentWindow : MonoBehaviour
 
         SetLayeredWindowAttributes(hWnd, 0,255,LWA_COLORKEY);
 
-        SetWindowPos(hWnd, HWND_TOPMOST, 0,0,0,0,0);
+        SetWindowPos(hWnd, HWND_TOPMOST, 0,0,0,0, 32 | 64);
+
+        ShowWindowAsync(hWnd, 3); 
 #endif
         Application.runInBackground = true;
     }
