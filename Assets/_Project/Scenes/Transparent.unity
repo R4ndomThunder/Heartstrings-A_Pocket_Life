@@ -65799,15 +65799,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Your \"Her\" has multiple needs that are shown as icons on the right side
-    of the screen. They'll decrease over time and based on her mood. Take care of
-    Her in order to make Her happy. You can make Her engage in different actions
-    in order to increse Her needs by clicking on the relative needs icon. You can
-    also pat Her to increse the \"Love\" meter.\n\n<page>Her can enter various moods
-    depending on Her actions and status, interacting in many ways with her surroundings.\n\r\n<u>Normal</u>:
-    Her can't wait to do something, roaming around doing her favourite pastime.\n\n<page><u>Creative</u>:
-    a surge of energy fills Her that is eager to do proactive activities.\n\r\n<u>Cozy</u>:
-    tired and happy, Her snuggles in a comfy blanket, perfect for couch and bed activities.\r\n\n<page><u>Sad</u>:
+  m_text: "Your \"Her\" has <color=#EE1E7C>multiple needs</color> that are shown
+    as icons on the right side of the screen. They'll <color=#EE1E7C>decrease over
+    time</color> and based on her mood. Take care of Her in order to make Her happy.
+    You can make Her engage in different actions in order to increse Her needs by
+    <color=#EE1E7C>clicking on the relative needs icon</color>. You can also pat
+    Her to increse the \"Love\" meter.\n\n<page>Her can enter <color=#EE1E7C>various
+    moods</color> depending on Her actions and status, interacting in many ways with
+    her surroundings.\n\r\n<u>Normal</u>: Her can't wait to do something, roaming
+    around doing her favourite pastime.\n\n<page><u>Creative</u>: a surge of energy
+    fills Her that is eager to do proactive activities.\n\r\n<u>Cozy</u>: tired and
+    happy, Her snuggles in a comfy blanket, perfect for couch and bed activities.\r\n\n<page><u>Sad</u>:
     you may have failed Her, ignoring her requests for cuddles or breaking Her moods
     one time too many. Her now needs you more than ever.\n\n<page>If Her love falls
     to zero Her will feel destroyed and will need TONS of cuddles to stand up again.\n\n\r<i>N.B.:
