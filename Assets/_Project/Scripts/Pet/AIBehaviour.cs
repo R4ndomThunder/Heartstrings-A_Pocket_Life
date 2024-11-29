@@ -15,6 +15,9 @@ public class AIBehaviour : MonoBehaviour, IClickable
     [SerializeField]
     internal GameObject cryingBody;
 
+    [SerializeField]
+    private Collider baseCollider, cryingCollider;
+
     internal int activityCounter = 0;
 
     NavMeshAgent agent;
@@ -318,6 +321,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
     void GameOver() { }
 
+    ActivityBase currentActivity;
     void UseActivity(ActivityBase act)
     {
         var dist = GetDistanceFromActivity(act);
@@ -325,7 +329,10 @@ public class AIBehaviour : MonoBehaviour, IClickable
         if (dist.HasValue && dist.Value <= .05f)
         {
             if (!act.isDoingSomething)
+            {
                 act.JoinActivity();
+                currentActivity = act;
+            }
             else
                 act.OnUpdate();
         }
@@ -388,6 +395,9 @@ public class AIBehaviour : MonoBehaviour, IClickable
         agent.SetDestination(targetPosition);
         body.SetActive(false);
         cryingBody.SetActive(true);
+
+        baseCollider.enabled = false;
+        cryingCollider.enabled = true;
     }
 
     void ResetPet()
@@ -397,6 +407,10 @@ public class AIBehaviour : MonoBehaviour, IClickable
         creativity.value = creativity.MinMaxValue.Max;
         hunger.value = hunger.MinMaxValue.Max;
         love.value = love.MinMaxValue.Max;
+
+
+        baseCollider.enabled = true;
+        cryingCollider.enabled = false;
 
         cryingBody.SetActive(false);
         body.SetActive(true);

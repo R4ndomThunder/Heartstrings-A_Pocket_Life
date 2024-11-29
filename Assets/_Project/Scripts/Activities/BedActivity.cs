@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class BedActivity : ActivityBase
 {
+    [SerializeField]
+    GameObject roomLights;
+
     [Header("Idle")]
     [SerializeField]
     private float idleEnergyIncrement = 0.05f;
@@ -21,6 +24,18 @@ public class BedActivity : ActivityBase
     [SerializeField]
     private float creativeHappyDecrement = 0.01f;
     private float creativeEnergyIncrement = 0.01f;
+
+    public override void JoinActivity()
+    {
+        base.JoinActivity();
+        roomLights.SetActive(false);
+    }
+
+    internal override void LeaveActivity()
+    {
+        base.LeaveActivity();
+        roomLights.SetActive(true);
+    }
 
 
     public override void OnUpdate()

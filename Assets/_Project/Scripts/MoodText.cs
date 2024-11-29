@@ -33,10 +33,18 @@ public class MoodText : MonoBehaviour
     {
         if (oldMood == PetMood.Blushy) return;
 
+        if (oldMood == PetMood.Cry)
+        {
+            StopAllCoroutines();
+            moodText.text = $"Her stopped crying";
+            StartCoroutine(HideTextCoroutine());
+            return;
+        }
+
         if (mood != PetMood.Cry && mood != PetMood.Blushy)
         {
             StopAllCoroutines();
-            moodText.text = $"Her feels {mood.ToString()}";
+            moodText.text = $"Her feels {mood.ToString().ToLower()}";
             StartCoroutine(HideTextCoroutine());
         }
     }
