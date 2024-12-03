@@ -74,6 +74,12 @@ public class AIBehaviour : MonoBehaviour, IClickable
     {
         nextDecisionTimer = decisionTimes.GetRandom();
         lastMousePos = Input.mousePosition;
+
+        energy.value = SaveSystem.gameData.character.energy;
+        hunger.value = SaveSystem.gameData.character.hunger;
+        creativity.value = SaveSystem.gameData.character.creativity;
+        happyness.value = SaveSystem.gameData.character.happyness;
+        love.value = SaveSystem.gameData.character.love;
     }
 
     private void Update()
@@ -93,13 +99,23 @@ public class AIBehaviour : MonoBehaviour, IClickable
         {
             energy.Remove(statsAmountDecrement * (isDoingActivity ? 1.5f : 1));
 
+            SaveSystem.gameData.character.energy = energy.GetValue();
+
             hunger.Remove(statsAmountDecrement);
+
+            SaveSystem.gameData.character.hunger = hunger.GetValue();
 
             creativity.Remove(statsAmountDecrement * creativityDecreasingCurve.Evaluate(creativity.GetValue() / 100f));
 
+            SaveSystem.gameData.character.creativity = creativity.GetValue();
+
             happyness.Remove(statsAmountDecrement * happynessDecreasingCurve.Evaluate(happyness.GetValue() / 100f));
 
+            SaveSystem.gameData.character.happyness = happyness.GetValue();
+
             love.Remove(statsAmountDecrement * (loveDecreasingCurve.Evaluate(happyness.GetValue() / 100f)));
+
+            SaveSystem.gameData.character.love = love.GetValue();
 
             if (happyness.GetValue() <= 0)
             {
@@ -254,39 +270,46 @@ public class AIBehaviour : MonoBehaviour, IClickable
         }
     }
 
-    void GoToPc()
+    public void GoToPc()
     {
         targetPosition = pc.targetPos.position;
         agent.SetDestination(targetPosition);
         ChangeState(PetState.Working);
     }
 
-    void GoToTVSofa()
+    public void GoToTVSofa()
     {
         targetPosition = sofa.targetPos.position;
         agent.SetDestination(targetPosition);
         ChangeState(PetState.WatchTV);
     }
 
-    void GoToGamingSofa()
+    public void GoToGamingSofa()
     {
         targetPosition = sofa.targetPos.position;
         agent.SetDestination(targetPosition);
         ChangeState(PetState.Gaming);
     }
 
-    void GoToMusic()
+    public void GoToMusic()
     {
         targetPosition = music.targetPos.position;
         agent.SetDestination(targetPosition);
         ChangeState(PetState.ListenMusic);
     }
 
-    void GoToArt()
+    public void GoToArt()
     {
         targetPosition = art.targetPos.position;
         agent.SetDestination(targetPosition);
         ChangeState(PetState.Drawing);
+    }
+
+    public void LeaveActivity()
+    {
+        targetPosition = transform.position;
+        agent.SetDestination(targetPosition);
+        ChangeState(PetState.Idle);
     }
 
     void Sleep()
@@ -355,8 +378,6 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
     void Pat()
     {
-        if (currentState != PetState.Idle && currentState != PetState.Walking && currentState != PetState.GameOver) return;
-
         if (currentState == PetState.GameOver)
         {
             if (!loveParticle.isPlaying)
@@ -395,7 +416,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
         agent.SetDestination(targetPosition);
         body.SetActive(false);
         cryingBody.SetActive(true);
-
+        SaveSystem.gameData.character.lastCryDate = DateTime.Now;
         baseCollider.enabled = false;
         cryingCollider.enabled = true;
     }
@@ -407,7 +428,6 @@ public class AIBehaviour : MonoBehaviour, IClickable
         creativity.value = creativity.MinMaxValue.Max;
         hunger.value = hunger.MinMaxValue.Max;
         love.value = love.MinMaxValue.Max;
-
 
         baseCollider.enabled = true;
         cryingCollider.enabled = false;
@@ -450,6 +470,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
     public void ChangeState(PetState state)
     {
         currentState = state;
+        SaveSystem.gameData.character.currentState = (int)state;
     }
 
     public void ChangeMood(PetMood mood)
@@ -457,6 +478,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
         OnMoodChanged.Invoke(currentMood, mood);
         currentMood = mood;
         copertina.SetActive(mood == PetMood.Cozy);
+        SaveSystem.gameData.character.currentMood = (int)mood;
     }
 
     public void OnClickDown()

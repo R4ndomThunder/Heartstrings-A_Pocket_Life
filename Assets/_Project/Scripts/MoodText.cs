@@ -44,7 +44,7 @@ public class MoodText : MonoBehaviour
         if (mood != PetMood.Cry && mood != PetMood.Blushy)
         {
             StopAllCoroutines();
-            moodText.text = $"Her feels {mood.ToString().ToLower()}";
+            moodText.text = $"{SaveSystem.gameData.character.characterName} is feeling {mood.ToString().ToLower()}";
             StartCoroutine(HideTextCoroutine());
         }
     }

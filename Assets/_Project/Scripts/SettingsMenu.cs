@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
-using UnityEngine.UI;
 using AudioSettings = RTDK.GameSystems.GameSettings.AudioSettings;
+using Slider = UnityEngine.UI.Slider;
 
 public class SettingsMenu : MonoBehaviour
 {
@@ -19,57 +17,93 @@ public class SettingsMenu : MonoBehaviour
     [SerializeField]
     TMP_Dropdown displayDropdown;
 
-    public static Action onDisplayChange = delegate { };
+    [SerializeField]
+    TMP_InputField nameField;
+
+    [SerializeField]
+    RectTransform gameWindow;
+
+    WindowSize windowSize;
 
     private void Start()
     {
-        musicSlider.value = AudioSettings.GetVolume(mixer, "BGM");
-        audioSlider.value = AudioSettings.GetVolume(mixer, "SFX");
+        InitAudio();
+
+        InitName();
 
         InitDisplayDropdown();
+    }
+
+    void InitName()
+    {
+        nameField.text = SaveSystem.gameData.character.characterName;
+    }
+
+    void InitAudio()
+    {
+        musicSlider.value = SaveSystem.gameData.settings.musicVol;
+        AudioSettings.SetVolume(mixer, "BGM", musicSlider.value);
+        audioSlider.value = SaveSystem.gameData.settings.soundVol;
+        AudioSettings.SetVolume(mixer, "SFX", audioSlider.value);
     }
 
     void InitDisplayDropdown()
     {
         displayDropdown.ClearOptions();
         List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
-        for (int i = 0; i < Display.displays.Length; i++)
+
+        foreach (var item in Enum.GetNames(typeof(WindowSize)))
         {
             options.Add(new TMP_Dropdown.OptionData
             {
-                text = $"Screen {i}"
+                text = $"{item}"
             });
         }
 
         displayDropdown.AddOptions(options);
+
+        displayDropdown.value = SaveSystem.gameData.settings.windowSize;
+    }
+
+    public void SetPetName(string name)
+    {
+        SaveSystem.gameData.character.characterName = name;
     }
 
     public void SetActiveDisplay(int id)
     {
-        var x = Display.displays[id].systemWidth;
-        var y = Display.displays[id].systemHeight;
-
-        Screen.MoveMainWindowTo(new DisplayInfo
+        switch ((WindowSize)id)
         {
-            width = x,
-            height = y,
-            refreshRate = new RefreshRate { numerator = 60, denominator = 1 },
-        }, new Vector2Int(0, 0));
+            case WindowSize.Small:
+                gameWindow.sizeDelta = new Vector2(300, 340);
+                break;
 
-        Display.displays[id].Activate();
+            case WindowSize.Medium:
+                gameWindow.sizeDelta = new Vector2(400, 440);
+                break;
 
-        Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
+            case WindowSize.Large:
+                gameWindow.sizeDelta = new Vector2(500, 540);
+                break;
+        }
 
-        onDisplayChange?.Invoke();
+        SaveSystem.gameData.settings.windowSize = id;
     }
 
     public void OnMusicVolumeChange(float val)
     {
         AudioSettings.SetVolume(mixer, "BGM", val);
+        SaveSystem.gameData.settings.musicVol = val;
     }
 
     public void OnSFXVolumeChange(float val)
     {
         AudioSettings.SetVolume(mixer, "SFX", val);
+        SaveSystem.gameData.settings.soundVol = val;
     }
+}
+
+public enum WindowSize
+{
+    Small, Medium, Large
 }
