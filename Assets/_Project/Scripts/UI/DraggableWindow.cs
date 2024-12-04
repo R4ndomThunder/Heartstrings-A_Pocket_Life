@@ -2,7 +2,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class DraggableWindow : MonoBehaviour, IDragHandler, IPointerDownHandler
+public class DraggableWindow : MonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField] private RectTransform rect;
     [SerializeField] private Canvas canvas;
@@ -15,6 +15,18 @@ public class DraggableWindow : MonoBehaviour, IDragHandler, IPointerDownHandler
     void Awake()
     {
         Setup();
+    }
+
+    void Start()
+    {
+        var parent = transform.parent.gameObject;
+
+        var winData = SaveSystem.gameData.GetWindowState(parent.name);
+        if (winData != null)
+        {
+            rect.anchoredPosition = new(winData.x, winData.y);
+            parent.SetActive(winData.isOpen);   
+        }
     }
 
     void Setup()
@@ -34,5 +46,18 @@ public class DraggableWindow : MonoBehaviour, IDragHandler, IPointerDownHandler
     public void OnPointerDown(PointerEventData eventData)
     {
         rect.SetAsLastSibling();
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        var parent = transform.parent.gameObject;
+        SaveSystem.gameData.SaveWindowState(parent.name, rect.anchoredPosition, parent.activeSelf);
+    }
+
+    public void CloseWindow()
+    {
+        var parent = transform.parent.gameObject;
+        parent.SetActive(false);
+        SaveSystem.gameData.SaveWindowState(parent.name, rect.anchoredPosition, parent.activeSelf);
     }
 }

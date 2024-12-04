@@ -34,7 +34,12 @@ public abstract class ActivityBase : MonoBehaviour
             activityParticle.Stop();
 
         if (isACreativeActivity)
+        {
             ai.activityCounter++;
+            SaveSystem.gameData.character.activityCounter = ai.activityCounter;
+        }
+
+        ai.currentActivity = null;
     }
 
     public virtual void JoinActivity()

@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class MoodText : MonoBehaviour
 {
+    [SerializeField]
+    GameObject moodPanel;
+    [SerializeField]
     TextMeshProUGUI moodText;
     [SerializeField]
     float timeText = 5;
@@ -13,7 +16,6 @@ public class MoodText : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
-        moodText = GetComponent<TextMeshProUGUI>();
         wfs = new WaitForSeconds(timeText);
 
         AIBehaviour.OnMoodChanged += OnMoodChange;
@@ -36,7 +38,8 @@ public class MoodText : MonoBehaviour
         if (oldMood == PetMood.Cry)
         {
             StopAllCoroutines();
-            moodText.text = $"Her stopped crying";
+            moodPanel.SetActive(true);
+            moodText.text = $"{SaveSystem.gameData.character.characterName} stopped crying";
             StartCoroutine(HideTextCoroutine());
             return;
         }
@@ -44,6 +47,7 @@ public class MoodText : MonoBehaviour
         if (mood != PetMood.Cry && mood != PetMood.Blushy)
         {
             StopAllCoroutines();
+            moodPanel.SetActive(true);
             moodText.text = $"{SaveSystem.gameData.character.characterName} is feeling {mood.ToString().ToLower()}";
             StartCoroutine(HideTextCoroutine());
         }
@@ -59,5 +63,6 @@ public class MoodText : MonoBehaviour
     void HideText()
     {
         moodText.text = string.Empty;
+        moodPanel.SetActive(false);
     }
 }

@@ -18,6 +18,9 @@ public class AIBehaviour : MonoBehaviour, IClickable
     [SerializeField]
     private Collider baseCollider, cryingCollider;
 
+    [SerializeField]
+    private GameObject stopActivityBtn;
+
     internal int activityCounter = 0;
 
     NavMeshAgent agent;
@@ -80,6 +83,10 @@ public class AIBehaviour : MonoBehaviour, IClickable
         creativity.value = SaveSystem.gameData.character.creativity;
         happyness.value = SaveSystem.gameData.character.happyness;
         love.value = SaveSystem.gameData.character.love;
+
+        ChangeMood((PetMood)SaveSystem.gameData.character.currentMood);
+        ChangeState((PetState)SaveSystem.gameData.character.currentState);
+        activityCounter = SaveSystem.gameData.character.activityCounter;
     }
 
     private void Update()
@@ -90,7 +97,17 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
         HandleState();
 
+        stopActivityBtn.SetActive(currentActivity != null);
+
         anim.SetFloat("Speed", agent.velocity.sqrMagnitude > 0 ? 1 : 0);
+    }
+
+    public void LeaveCurrentActivity()
+    {
+        if (currentActivity != null)
+        {
+            currentActivity.LeaveActivity();
+        }
     }
 
     void ConsumeStats()
@@ -141,6 +158,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
                     else if (activityCounter > 3 && energy.GetValue() > statsThreshold)
                     {
                         activityCounter = 0;
+                        SaveSystem.gameData.character.activityCounter = activityCounter;
                         ChangeMood(PetMood.Creative);
                     }
                 }
@@ -162,6 +180,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
                         if (activityCounter > 3)
                         {
                             activityCounter = 0;
+                            SaveSystem.gameData.character.activityCounter = activityCounter;
                             ChangeMood(PetMood.Normal);
                         }
                     }
@@ -176,6 +195,8 @@ public class AIBehaviour : MonoBehaviour, IClickable
                 }
                 break;
         }
+
+
     }
 
     void HandleState()
@@ -307,9 +328,8 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
     public void LeaveActivity()
     {
-        targetPosition = transform.position;
-        agent.SetDestination(targetPosition);
-        ChangeState(PetState.Idle);
+        if (currentActivity != null)
+            currentActivity.LeaveActivity();
     }
 
     void Sleep()
@@ -344,7 +364,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
     void GameOver() { }
 
-    ActivityBase currentActivity;
+    internal ActivityBase currentActivity;
     void UseActivity(ActivityBase act)
     {
         var dist = GetDistanceFromActivity(act);
@@ -416,7 +436,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
         agent.SetDestination(targetPosition);
         body.SetActive(false);
         cryingBody.SetActive(true);
-        SaveSystem.gameData.character.lastCryDate = DateTime.Now;
+        SaveSystem.gameData.character.lastCryDate = DateTime.Now.ToBinary();
         baseCollider.enabled = false;
         cryingCollider.enabled = true;
     }
