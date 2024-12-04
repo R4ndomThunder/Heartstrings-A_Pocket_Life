@@ -25,6 +25,29 @@ public class Accordion : MonoBehaviour
         UpdateUI();
     }
 
+    private void Start()
+    {
+        SetActiveDisplay(SaveSystem.gameData.settings.windowSize);
+    }
+
+    public void SetActiveDisplay(int id)
+    {
+        switch ((WindowSize)id)
+        {
+            case WindowSize.Small:
+                rect.sizeDelta = new Vector2(300, 340);
+                break;
+
+            case WindowSize.Medium:
+                rect.sizeDelta = new Vector2(400, 440);
+                break;
+
+            case WindowSize.Large:
+                rect.sizeDelta = new Vector2(500, 540);
+                break;
+        }
+    }
+
     public void ToggleCompact()
     {
         isCompact = !isCompact;

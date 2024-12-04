@@ -12,6 +12,8 @@ public class SofaActivity : ActivityBase
     [SerializeField]
     ParticleSystem filmParticle, gameParticle;
 
+    [SerializeField]
+    AudioClip filmAudio, gameAudio;
     public override void OnUpdate()
     {
         base.OnUpdate();
@@ -41,6 +43,15 @@ public class SofaActivity : ActivityBase
                 else
                     filmParticle.Play();
             }
+
+            if (filmAudio != null)
+            {
+                source.clip = filmAudio;
+                if (playerIsVisible)
+                    source.Stop();
+                else
+                    source.Play();
+            }
         }
         else if (ai.GetCurrentMood() == PetMood.Normal)
         {
@@ -55,6 +66,15 @@ public class SofaActivity : ActivityBase
                     gameParticle.Stop();
                 else
                     gameParticle.Play();
+            }
+
+            if (gameAudio != null)
+            {
+                source.clip = gameAudio;
+                if (playerIsVisible) 
+                    source.Stop();
+                else
+                    source.Play();
             }
         }
 

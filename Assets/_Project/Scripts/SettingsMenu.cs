@@ -25,7 +25,7 @@ public class SettingsMenu : MonoBehaviour
 
     WindowSize windowSize;
 
-    private void Start()
+    private void Awake()
     {
         InitAudio();
 

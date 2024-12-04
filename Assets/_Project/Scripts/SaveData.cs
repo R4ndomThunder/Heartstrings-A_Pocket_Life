@@ -74,6 +74,7 @@ public class GameData
 public class CharacterData
 {
     public long lastCryDate = DateTime.Now.ToBinary();
+    public float x, y, z;
     public string characterName = "Her";
     public float happyness = 100, love = 100, creativity = 100, hunger = 100, energy = 100;
     public int currentMood = 0;

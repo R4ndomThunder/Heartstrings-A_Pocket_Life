@@ -85,8 +85,9 @@ public class AIBehaviour : MonoBehaviour, IClickable
         love.value = SaveSystem.gameData.character.love;
 
         ChangeMood((PetMood)SaveSystem.gameData.character.currentMood);
-        ChangeState((PetState)SaveSystem.gameData.character.currentState);
         activityCounter = SaveSystem.gameData.character.activityCounter;
+
+        transform.position = new Vector3(SaveSystem.gameData.character.x, SaveSystem.gameData.character.y, SaveSystem.gameData.character.z);
     }
 
     private void Update()
@@ -484,6 +485,12 @@ public class AIBehaviour : MonoBehaviour, IClickable
         {
             nextDecisionTimer = decisionTimes.GetRandom();
             currentState = PetState.Idle;
+        }
+        else
+        {
+            SaveSystem.gameData.character.x = transform.position.x;
+            SaveSystem.gameData.character.y = transform.position.y;
+            SaveSystem.gameData.character.z = transform.position.z;
         }
     }
 
