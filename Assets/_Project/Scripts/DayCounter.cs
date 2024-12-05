@@ -21,6 +21,6 @@ public class DayCounter : MonoBehaviour
     {
         var date = SaveSystem.gameData.character.lastCryDate;
         var time = DateTime.Now.Subtract(DateTime.FromBinary(date));
-        counterText.text = $"{SaveSystem.gameData.character.characterName} has passed\n{time.Days} days {time.Hours} hours {time.Minutes} minutes\nwithout crying";
+        counterText.text = $"<color=#EE1E7C>{SaveSystem.gameData.character.characterName}</color> has passed\n<color=#EE1E7C>{time.Days} days {time.Hours} hours {time.Minutes} minutes</color>\nwithout crying";
     }
 }

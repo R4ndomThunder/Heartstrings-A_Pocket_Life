@@ -25,7 +25,16 @@ public class SettingsMenu : MonoBehaviour
 
     WindowSize windowSize;
 
-    private void Awake()
+    private void Start()
+    {
+        InitAudio();
+
+        InitName();
+
+        InitDisplayDropdown();
+    }
+
+    private void OnEnable()
     {
         InitAudio();
 
@@ -42,9 +51,7 @@ public class SettingsMenu : MonoBehaviour
     void InitAudio()
     {
         musicSlider.value = SaveSystem.gameData.settings.musicVol;
-        AudioSettings.SetVolume(mixer, "BGM", musicSlider.value);
         audioSlider.value = SaveSystem.gameData.settings.soundVol;
-        AudioSettings.SetVolume(mixer, "SFX", audioSlider.value);
     }
 
     void InitDisplayDropdown()

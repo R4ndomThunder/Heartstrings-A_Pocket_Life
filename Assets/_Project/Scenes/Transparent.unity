@@ -31342,7 +31342,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -547.4, y: 104.89}
+  m_AnchoredPosition: {x: -547.3999, y: 104.88989}
   m_SizeDelta: {x: 200, y: 290}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &578321004
@@ -31559,7 +31559,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: -70, y: 412.4}
-  m_SizeDelta: {x: 200, y: 140}
+  m_SizeDelta: {x: 250, y: 140}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &580511818
 MonoBehaviour:
@@ -35568,7 +35568,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -20, y: 54.890015}
+  m_AnchoredPosition: {x: -20, y: 54.890137}
   m_SizeDelta: {x: 300, y: 340}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &785412253
@@ -53432,7 +53432,7 @@ MonoBehaviour:
   ai: {fileID: 0}
   objectToToggle:
   - {fileID: 676220001}
-  activityAudio: {fileID: 8300000, guid: dec828d3bce22e94b997c63090c5345c, type: 3}
+  activityAudio: {fileID: 0}
   targetPos: {fileID: 580037852}
   isACreativeActivity: 1
   activityParticle: {fileID: 1543376813}
@@ -64844,7 +64844,7 @@ MonoBehaviour:
   ai: {fileID: 0}
   objectToToggle:
   - {fileID: 1628760893}
-  activityAudio: {fileID: 8300000, guid: 4b42ffadbbc81a34cbbe4262ad0b1540, type: 3}
+  activityAudio: {fileID: 0}
   targetPos: {fileID: 828936101}
   isACreativeActivity: 0
   activityParticle: {fileID: 916854914}
@@ -72996,7 +72996,7 @@ MonoBehaviour:
   ai: {fileID: 0}
   objectToToggle:
   - {fileID: 1316709652}
-  activityAudio: {fileID: 8300000, guid: fff17c357aa7dcd4b811b64b6e3cbbe9, type: 3}
+  activityAudio: {fileID: 0}
   targetPos: {fileID: 1168445466}
   isACreativeActivity: 0
   activityParticle: {fileID: 55779008}
@@ -88115,8 +88115,8 @@ MonoBehaviour:
   - {fileID: 2128846527}
   filmParticle: {fileID: 201859028}
   gameParticle: {fileID: 186563473}
-  filmAudio: {fileID: 8300000, guid: e3dda1565e583db4e8c9e25483101f02, type: 3}
-  gameAudio: {fileID: 8300000, guid: 0444d6dc4bea1db4483567ee5b4774ca, type: 3}
+  filmAudio: {fileID: 0}
+  gameAudio: {fileID: 0}
 --- !u!82 &1643502533
 AudioSource:
   m_ObjectHideFlags: 0
@@ -98548,7 +98548,7 @@ MonoBehaviour:
   ai: {fileID: 0}
   objectToToggle:
   - {fileID: 2039562043}
-  activityAudio: {fileID: 8300000, guid: a97fc0b07b7520644ac1d1b8ec7ef377, type: 3}
+  activityAudio: {fileID: 0}
   targetPos: {fileID: 1515224603}
   isACreativeActivity: 1
   activityParticle: {fileID: 1709457770}
@@ -112704,7 +112704,7 @@ MonoBehaviour:
   ai: {fileID: 0}
   objectToToggle:
   - {fileID: 1479013674}
-  activityAudio: {fileID: 8300000, guid: 46d41ffa676be334aa3e2168dcf2467c, type: 3}
+  activityAudio: {fileID: 0}
   targetPos: {fileID: 1743410975}
   isACreativeActivity: 1
   activityParticle: {fileID: 924333307}

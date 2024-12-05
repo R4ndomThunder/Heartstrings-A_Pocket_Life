@@ -1,3 +1,4 @@
+using RTDK.Logger;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -25,9 +26,17 @@ public class DraggableWindow : MonoBehaviour, IDragHandler, IPointerDownHandler,
         if (winData != null)
         {
             rect.anchoredPosition = new(winData.x, winData.y);
-            parent.SetActive(winData.isOpen);   
+            parent.SetActive(winData.isOpen);
         }
     }
+
+    void OnEnable()
+    {
+        var parent = transform.parent.gameObject;
+        SaveSystem.gameData.SaveWindowState(parent.name, rect.anchoredPosition, parent.activeSelf);
+        RTDKLogger.Log($"Saving window data.");
+    }
+
 
     void Setup()
     {
