@@ -399,6 +399,8 @@ public class AIBehaviour : MonoBehaviour, IClickable
 
     void Pat()
     {
+        if (!body.activeSelf) return;
+
         if (currentState == PetState.GameOver)
         {
             if (!loveParticle.isPlaying)
@@ -437,7 +439,7 @@ public class AIBehaviour : MonoBehaviour, IClickable
         agent.SetDestination(targetPosition);
         body.SetActive(false);
         cryingBody.SetActive(true);
-        SaveSystem.gameData.character.lastCryDate = DateTime.Now.ToBinary();
+        SaveSystem.gameData.character.timeFromLastCry = 0;
         baseCollider.enabled = false;
         cryingCollider.enabled = true;
     }

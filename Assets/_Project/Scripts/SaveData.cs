@@ -73,7 +73,7 @@ public class GameData
 [Serializable]
 public class CharacterData
 {
-    public long lastCryDate = DateTime.Now.ToBinary();
+    public int timeFromLastCry = 0;
     public float x, y, z;
     public string characterName = "Her";
     public float happyness = 100, love = 100, creativity = 100, hunger = 100, energy = 100;
@@ -83,16 +83,10 @@ public class CharacterData
 
     public CharacterData()
     {
-        lastCryDate = DateTime.Now.ToBinary();
         characterName = "Her";
-        happyness = 100;
-        love = 100;
-        creativity = 100;
-        hunger = 100;
-        energy = 100;
-
-        currentMood = 0;
-        currentState = 0;
+        happyness = love = creativity = hunger = energy = 100;
+        timeFromLastCry = currentMood = currentState = 0;
+        x = y = z = 0;
     }
 }
 

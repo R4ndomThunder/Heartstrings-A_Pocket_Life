@@ -6335,7 +6335,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: 03f4fae58488b734bbfc76834f019410, type: 3}
   m_Resource: {fileID: 8300000, guid: 03f4fae58488b734bbfc76834f019410, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.8
+  m_Volume: 0.6
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -12889,7 +12889,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: ede0d7caa6ff90949b4b6032495985a5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8f58077ea7da3dc498a716319413b5cf, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -30245,7 +30245,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.4
+  m_Volume: 0.25
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -35719,6 +35719,7 @@ MonoBehaviour:
   objectsToDisplay:
   - {fileID: 322611797}
   - {fileID: 331529221}
+  - {fileID: 637309068}
 --- !u!114 &785412257
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51356,7 +51357,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 3f3bd597b9e8be348bc5e413066265d3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7c35fc39685051141a14a48fea4af53b, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -70735,7 +70736,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Pet Name:'
+  m_text: 'Her Name:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
   m_sharedMaterial: {fileID: 2164040, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
@@ -71518,17 +71519,17 @@ MonoBehaviour:
     as icons on the right side of the screen. They'll <color=#EE1E7C>decrease over
     time</color> and based on her mood. Take care of Her in order to make Her happy.
     You can make Her engage in different actions in order to increse Her needs by
-    <color=#EE1E7C>clicking on the relative needs icon</color>. You can also pat
-    Her to increse the \"Love\" meter.\n\n<page>Her can enter <color=#EE1E7C>various
-    moods</color> depending on Her actions and status, interacting in many ways with
-    her surroundings.\n\r\n<u>Normal</u>: Her can't wait to do something, roaming
-    around doing her favourite pastime.\n\n<page><u>Creative</u>: a surge of energy
-    fills Her that is eager to do proactive activities.\n\r\n<u>Cozy</u>: tired and
-    happy, Her snuggles in a comfy blanket, perfect for couch and bed activities.\r\n\n<page><u>Sad</u>:
+    <color=#EE1E7C>clicking on the buttons</color> placed on the bottom. \nYou can
+    also pat Her to increse the \"Love\" by <color=#EE1E7C>click and drag on Her</color>.\n\n<page>Depending
+    on actions and status, Her can change <color=#EE1E7C>various moods</color>:\n\r\n<color=#EE1E7C><u>Normal</u></color>:
+    Her can't wait to do something, roaming around doing her favourite pastime.\n\n<color=#EE1E7C><u>Creative</u></color>:
+    a surge of energy fills Her that is eager to do proactive activities.\n\r\n<page><color=#EE1E7C><u>Cozy</u></color>:
+    tired and happy, Her snuggles in a comfy blanket, perfect for couch and bed activities.\r\n\n<color=#EE1E7C><u>Sad</u></color>:
     you may have failed Her, ignoring her requests for cuddles or breaking Her moods
-    one time too many. Her now needs you more than ever.\n\n<page>If Her love falls
-    to zero Her will feel destroyed and will need TONS of cuddles to stand up again.\n\n\r<i>N.B.:
-    Pats and cuddles are always accepted and needed.</i>\r\n"
+    one time too many. Her now needs you more than ever.\n\n<page>If Her <color=#EE1E7C>happyness
+    falls to zero</color> Her will feel destroyed and will <color=#EE1E7C>need TONS
+    of cuddles</color> to stand up again.\n\n\r<i>N.B.: Pats and cuddles are always
+    accepted and needed.</i>\r\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
   m_sharedMaterial: {fileID: 2164040, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
@@ -71555,8 +71556,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 12
-  m_fontSizeBase: 12
+  m_fontSize: 11.5
+  m_fontSizeBase: 11.5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -100352,7 +100353,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b6b4c40e3e1e2c542b281e228877a5f7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 951079444544ca94db6f8367e54fc74f, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

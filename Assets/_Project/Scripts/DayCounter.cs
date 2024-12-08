@@ -2,6 +2,7 @@ using RTDK.GameSystems.SaveSystem;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class DayCounter : MonoBehaviour
 {
@@ -19,8 +20,12 @@ public class DayCounter : MonoBehaviour
 
     void UpdateCounter()
     {
-        var date = SaveSystem.gameData.character.lastCryDate;
-        var time = DateTime.Now.Subtract(DateTime.FromBinary(date));
+        if (SaveSystem.gameData.character.currentState == 9) return;
+
+        SaveSystem.gameData.character.timeFromLastCry++;
+
+        TimeSpan time = TimeSpan.FromSeconds(SaveSystem.gameData.character.timeFromLastCry);
+
         counterText.text = $"<color=#EE1E7C>{SaveSystem.gameData.character.characterName}</color> has passed\n<color=#EE1E7C>{time.Days} days {time.Hours} hours {time.Minutes} minutes</color>\nwithout crying";
     }
 }
